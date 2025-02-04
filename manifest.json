@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "YouTrack Issue Copier",
+    "version": "1.1",
+    "description": "YouTrack 이슈를 마크다운 형식으로 복사하는 확장 프로그램",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "clipboardWrite"
+    ],
+    "host_permissions": [
+      "*://*.youtrack.cloud/*"
+    ],
+    "action": {
+      "default_popup": "src/html/popup.html"
+    }
+}
