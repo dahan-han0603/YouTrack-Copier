@@ -32,19 +32,20 @@ document.getElementById("copyButton").addEventListener("click", async () => {
 
     await showStatus("복사 중...", 'success');
 
-    // 먼저 issueUtils.js 주입
+    // 복사 함수 실행
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ['src/js/issueUtils.js']
     });
 
-    // 그 다음 복사 함수 실행
+    // 실제 복사 함수 실행
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: async () => {
         try {
           return await window.copyIssueToMarkdown();
         } catch (error) {
+          console.error('복사 중 오류:', error);
           return { success: false, error: error.message };
         }
       }
@@ -53,10 +54,9 @@ document.getElementById("copyButton").addEventListener("click", async () => {
     const result = results[0].result;
     if (result.success) {
       await showStatus("클립보드에 복사되었습니다! ✨", 'success');
-      // 성공 알림
       await chrome.notifications.create({
         type: 'basic',
-        // iconUrl: 'icons/icon48.png',  // 기본 아이콘 필요
+        iconUrl: '/icons/icon48.png',
         title: '복사 완료',
         message: '이슈가 클립보드에 복사되었습니다.'
       });
@@ -66,17 +66,11 @@ document.getElementById("copyButton").addEventListener("click", async () => {
   } catch (error) {
     console.error("오류 발생:", error);
     await showStatus(error.message, 'error');
-    // 실패 알림
     await chrome.notifications.create({
       type: 'basic',
-      // iconUrl: 'icons/icon48.png',  // 기본 아이콘 필요
+      iconUrl: '/icons/icon48.png',
       title: '복사 실패',
       message: '이슈 복사 중 오류가 발생했습니다.'
     });
   }
 });
-
-// copyIssueToMarkdown 함수를 window 객체에 할당
-if (typeof window !== 'undefined') {
-  window.copyIssueToMarkdown = copyIssueToMarkdown;
-}
