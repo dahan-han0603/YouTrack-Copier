@@ -8,11 +8,25 @@
   // 복사 함수 정의
   async function copyToClipboard(text) {
     try {
+      // 먼저 navigator.clipboard API 시도
       await navigator.clipboard.writeText(text);
       return true;
     } catch (err) {
-      console.error('클립보드 복사 실패:', err);
-      return false;
+      try {
+        // fallback: 임시 textarea 요소 사용
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return true;
+      } catch (fallbackErr) {
+        console.error('클립보드 복사 실패:', fallbackErr);
+        return false;
+      }
     }
   }
 
