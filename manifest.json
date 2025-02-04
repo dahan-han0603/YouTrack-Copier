@@ -6,12 +6,17 @@
     "permissions": [
       "activeTab",
       "scripting",
-      "clipboardWrite"
+      "clipboardWrite",
+      "contextMenus",
+      "notifications"
     ],
     "host_permissions": [
       "*://*.youtrack.cloud/*"
     ],
     "action": {
       "default_popup": "src/html/popup.html"
+    },
+    "background": {
+      "service_worker": "src/js/background.js"
     }
 }
