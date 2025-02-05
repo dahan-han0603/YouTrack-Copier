@@ -8,7 +8,11 @@ chrome.runtime.onInstalled.addListener(() => {
     id: "copyIssue",
     title: "이슈 복사",
     contexts: ["page"],
-    documentUrlPatterns: ["*://*.youtrack.cloud/issue/*"]
+    documentUrlPatterns: [
+      "*://*.youtrack.cloud/issue/*",
+      "*://*.youtrack.cloud/issues/*",
+      "*://*.youtrack.cloud/agiles/*"
+    ]
   });
 
   // 지식베이스 복사 메뉴 - 지식베이스 페이지에서만 표시
