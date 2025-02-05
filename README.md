@@ -1,4 +1,4 @@
-# YouTrack Issue Copier
+# YouTrack Copier
 
 YouTrack의 이슈와 지식베이스 문서를 텍스트 형식으로 변환하여 복사하는 크롬 확장 프로그램입니다.
 
