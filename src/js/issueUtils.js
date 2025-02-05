@@ -89,10 +89,16 @@
     return convertToMarkdown(clone).replace(/\n{3,}/g, '\n\n').trim();
   }
 
-  // 이슈 복사 메인 함수
+  // 텍스트 길이 제한 함수 추가
+  function truncateText(text, maxLength = 200) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  }
+
+  // 이슈 복사 메인 함수 수정
   async function copyIssueToMarkdown() {
     try {
-      const selectors = getSelectors();  // 선택자를 함수 호출로 가져오기
+      const selectors = getSelectors();
       
       // 이슈 ID 추출
       const issueIdElement = findElement(selectors.issueId.primary, selectors.issueId.fallback);
@@ -106,12 +112,25 @@
       const currentUrl = window.location.origin;
       const issueLink = `${currentUrl}/issue/${issueId}`;
 
-      // 이슈 내용 추출
+      // 이슈 내용 추출 및 처리
       const contentElement = findElement(selectors.content);
-      const content = processContent(contentElement);
+      let content = processContent(contentElement);
+      content = content.replace(/\n{2,}/g, '\n'); // 연속된 개행 처리
+      content = truncateText(content); // 길이 제한 적용
+      content = content.split('\n').map(line => '  ' + line).join('\n'); // 들여쓰기 적용
 
-      // 마크다운 형식으로 조합
-      const markdown = `# ${issueId} ${title}\n## 링크: ${issueLink}\n## 내용:\n${content}`;
+      // 구분선 정의
+      const separator = '━'.repeat(20);
+
+      // 새로운 템플릿 형식으로 조합
+      const markdown = `${separator}
+[${issueId}] ${title}
+${separator}
+▶ 링크
+  ${issueLink}
+▶ 내용
+${content}
+${separator}`;
       
       // 클립보드에 복사
       const success = await copyToClipboard(markdown);
