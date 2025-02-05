@@ -74,3 +74,48 @@ document.getElementById("copyButton").addEventListener("click", async () => {
     });
   }
 });
+
+// 지식베이스 복사 버튼 이벤트 리스너 추가
+document.getElementById("copyKnowledgeBaseButton").addEventListener("click", async () => {
+  try {
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+
+    if (!tab) {
+      throw new Error("현재 탭을 찾을 수 없습니다.");
+    }
+
+    await showStatus("복사 중...", 'success');
+
+    // 복사 함수 실행
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['src/js/issueUtils.js']
+    });
+
+    // 실제 복사 함수 실행
+    const results = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: async () => {
+        try {
+          return await window.copyKnowledgeBaseToMarkdown();
+        } catch (error) {
+          console.error('복사 중 오류:', error);
+          return { success: false, error: error.message };
+        }
+      }
+    });
+
+    const result = results[0].result;
+    if (result.success) {
+      await showStatus("클립보드에 복사되었습니다! ✨", 'success');
+    } else {
+      throw new Error(result.error || "알 수 없는 오류 발생");
+    }
+  } catch (error) {
+    console.error("오류 발생:", error);
+    await showStatus(error.message, 'error');
+  }
+});

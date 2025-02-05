@@ -42,6 +42,12 @@
       project: {
         primary: '.fieldValue__e480[data-test="ring-tooltip field-value"]',
         fallback: '.fieldValueButton__a700'
+      },
+      knowledgeBase: {
+        id: '.idLink__ee62 .articleId__ca09',
+        title: '.header__efad h1',
+        content: '.articleContent__cdf9',
+        project: '.breadCrumb__c48e.nonShrinkable__cca0'
       }
     };
   }
@@ -153,6 +159,60 @@ ${separator}`;
     }
   }
 
+  // 지식베이스 복사 함수 추가
+  async function copyKnowledgeBaseToMarkdown() {
+    try {
+      const selectors = getSelectors();
+      
+      // 프로젝트 이름 추출
+      const projectElement = document.querySelector(selectors.knowledgeBase.project);
+      const projectName = projectElement.textContent.trim();
+
+      // 지식베이스 ID 추출
+      const idElement = document.querySelector(selectors.knowledgeBase.id);
+      const kbId = idElement.textContent.trim();
+
+      // 제목 추출
+      const titleElement = document.querySelector(selectors.knowledgeBase.title);
+      const title = titleElement.textContent.trim();
+
+      // 링크 생성
+      const currentUrl = window.location.href;
+
+      // 내용 추출 및 처리
+      const contentElement = document.querySelector(selectors.knowledgeBase.content);
+      let content = processContent(contentElement);
+      content = content.replace(/\n{2,}/g, '\n'); // 연속된 개행 처리
+      content = truncateText(content); // 길이 제한 적용
+      content = content.split('\n').map(line => '  ' + line).join('\n'); // 들여쓰기 적용
+
+      // 구분선 정의
+      const separator = '━'.repeat(20);
+
+      // 템플릿 형식으로 조합
+      const markdown = `${separator}
+[${projectName}/${kbId}] ${title}
+${separator}
+▶ 링크
+  ${currentUrl}
+▶ 내용
+${content}
+${separator}`;
+      
+      // 클립보드에 복사
+      const success = await copyToClipboard(markdown);
+      return { success, markdown };
+    } catch (error) {
+      console.error("지식베이스 복사 중 오류 발생:", error);
+      return { 
+        success: false, 
+        error: `오류 발생: ${error.message}`,
+        details: error.stack 
+      };
+    }
+  }
+
   // 함수를 window 객체에 할당
   window.copyIssueToMarkdown = copyIssueToMarkdown;
+  window.copyKnowledgeBaseToMarkdown = copyKnowledgeBaseToMarkdown;
 })(); 
