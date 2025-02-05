@@ -105,9 +105,29 @@
     return text.substring(0, maxLength) + '...';
   }
 
+  // 페이지 타입 체크 함수
+  function checkPageType() {
+    const url = window.location.href;
+    // YouTrack의 이슈 URL 패턴을 더 정확하게 체크
+    if (url.match(/youtrack\.cloud\/issue\/.+/) || url.includes('/agiles/') || url.includes('/issues/')) {
+      return 'issue';
+    } else if (url.includes('/articles/')) {
+      return 'knowledgeBase';
+    }
+    return 'unknown';
+  }
+
   // 이슈 복사 메인 함수 수정
   async function copyIssueToMarkdown() {
     try {
+      const pageType = checkPageType();
+      if (pageType !== 'issue') {
+        return {
+          success: false,
+          error: '이슈 페이지에서만 사용할 수 있습니다.'
+        };
+      }
+
       const selectors = getSelectors();
       
       // 프로젝트 이름 추출
@@ -162,6 +182,14 @@ ${separator}`;
   // 지식베이스 복사 함수 추가
   async function copyKnowledgeBaseToMarkdown() {
     try {
+      const pageType = checkPageType();
+      if (pageType !== 'knowledgeBase') {
+        return {
+          success: false,
+          error: '지식베이스 페이지에서만 사용할 수 있습니다.'
+        };
+      }
+
       const selectors = getSelectors();
       
       // 프로젝트 이름 추출
