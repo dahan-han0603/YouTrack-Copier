@@ -38,7 +38,11 @@
         fallback: '[data-test="ring-link"]'
       },
       title: '[data-test="ticket-summary"]',
-      content: '.description__e030'
+      content: '.description__e030',
+      project: {
+        primary: '.fieldValue__e480[data-test="ring-tooltip field-value"]',
+        fallback: '.fieldValueButton__a700'
+      }
     };
   }
 
@@ -100,6 +104,10 @@
     try {
       const selectors = getSelectors();
       
+      // 프로젝트 이름 추출
+      const projectElement = findElement(selectors.project.primary, selectors.project.fallback);
+      const projectName = projectElement.textContent.trim();
+
       // 이슈 ID 추출
       const issueIdElement = findElement(selectors.issueId.primary, selectors.issueId.fallback);
       const issueId = issueIdElement.textContent.trim();
@@ -122,9 +130,9 @@
       // 구분선 정의
       const separator = '━'.repeat(20);
 
-      // 새로운 템플릿 형식으로 조합
+      // 새로운 템플릿 형식으로 조합 (프로젝트명 추가)
       const markdown = `${separator}
-[${issueId}] ${title}
+[${projectName}/${issueId}] ${title}
 ${separator}
 ▶ 링크
   ${issueLink}
