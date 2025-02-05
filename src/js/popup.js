@@ -1,3 +1,9 @@
+/**
+ * 상태 메시지를 표시하는 함수
+ * @param {string} message - 표시할 메시지
+ * @param {'success'|'error'} type - 메시지 타입 (기본값: 'success')
+ * @returns {Promise<void>}
+ */
 async function showStatus(message, type = 'success') {
   const status = document.getElementById("status");
   const statusText = status.querySelector(".status-text");
@@ -19,6 +25,7 @@ async function showStatus(message, type = 'success') {
   }, 3000);
 }
 
+// 이슈 복사 버튼 이벤트 리스너
 document.getElementById("copyButton").addEventListener("click", async () => {
   try {
     const [tab] = await chrome.tabs.query({
@@ -75,7 +82,7 @@ document.getElementById("copyButton").addEventListener("click", async () => {
   }
 });
 
-// 지식베이스 복사 버튼 이벤트 리스너 추가
+// 지식베이스 복사 버튼 이벤트 리스너
 document.getElementById("copyKnowledgeBaseButton").addEventListener("click", async () => {
   try {
     const [tab] = await chrome.tabs.query({

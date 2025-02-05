@@ -1,4 +1,7 @@
-// 컨텍스트 메뉴 생성
+/**
+ * 확장 프로그램이 설치될 때 실행되는 이벤트 리스너
+ * 컨텍스트 메뉴 항목들을 생성합니다.
+ */
 chrome.runtime.onInstalled.addListener(() => {
   // 이슈 복사 메뉴 - 이슈 페이지에서만 표시
   chrome.contextMenus.create({
@@ -17,7 +20,12 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-// 컨텍스트 메뉴 클릭 이벤트 처리
+/**
+ * 컨텍스트 메뉴 클릭 이벤트를 처리하는 리스너
+ * 선택된 메뉴에 따라 이슈 또는 지식베이스 복사 기능을 실행합니다.
+ * @param {Object} info - 클릭된 메뉴 정보
+ * @param {chrome.tabs.Tab} tab - 현재 활성화된 탭 정보
+ */
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   try {
     // 복사 함수 실행

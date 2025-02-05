@@ -5,7 +5,11 @@
     return;
   }
 
-  // 복사 함수 정의
+  /**
+   * 텍스트를 클립보드에 복사하는 함수
+   * @param {string} text - 복사할 텍스트
+   * @returns {Promise<boolean>} 복사 성공 여부
+   */
   async function copyToClipboard(text) {
     try {
       // 먼저 navigator.clipboard API 시도
@@ -30,7 +34,10 @@
     }
   }
 
-  // DOM 요소 선택자를 함수 내부로 이동
+  /**
+   * DOM 선택자들을 반환하는 함수
+   * @returns {Object} 이슈와 지식베이스 페이지의 DOM 선택자들
+   */
   function getSelectors() {
     return {
       issueId: {
@@ -52,14 +59,24 @@
     };
   }
 
-  // DOM 요소 찾기 함수
+  /**
+   * DOM 요소를 찾는 함수
+   * @param {string} primary - 기본 선택자
+   * @param {string} fallback - 대체 선택자
+   * @returns {Element} 찾은 DOM 요소
+   * @throws {Error} 요소를 찾지 못한 경우
+   */
   function findElement(primary, fallback) {
     const element = document.querySelector(primary) || document.querySelector(fallback);
     if (!element) throw new Error(`요소를 찾을 수 없습니다: ${primary}`);
     return element;
   }
 
-  // 컨텐츠 처리 함수
+  /**
+   * HTML 컨텐츠를 마크다운으로 변환하는 함수
+   * @param {Element} element - 변환할 HTML 요소
+   * @returns {string} 변환된 마크다운 텍스트
+   */
   function processContent(element) {
     const blockElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'li'];
     const clone = element.cloneNode(true);
@@ -99,13 +116,21 @@
     return convertToMarkdown(clone).replace(/\n{3,}/g, '\n\n').trim();
   }
 
-  // 텍스트 길이 제한 함수 추가
+  /**
+   * 텍스트를 지정된 길이로 제한하는 함수
+   * @param {string} text - 원본 텍스트
+   * @param {number} maxLength - 최대 길이 (기본값: 200)
+   * @returns {string} 제한된 텍스트
+   */
   function truncateText(text, maxLength = 200) {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   }
 
-  // 페이지 타입 체크 함수
+  /**
+   * 현재 페이지의 타입을 확인하는 함수
+   * @returns {'issue'|'knowledgeBase'|'unknown'} 페이지 타입
+   */
   function checkPageType() {
     const url = window.location.href;
     // YouTrack의 이슈 URL 패턴을 더 정확하게 체크
@@ -117,7 +142,14 @@
     return 'unknown';
   }
 
-  // 이슈 복사 메인 함수 수정
+  /**
+   * YouTrack 이슈를 마크다운 형식으로 복사하는 함수
+   * @returns {Promise<Object>} 복사 결과 객체
+   * @property {boolean} success - 복사 성공 여부
+   * @property {string} [markdown] - 생성된 마크다운 텍스트
+   * @property {string} [error] - 오류 메시지
+   * @property {string} [details] - 상세 오류 정보
+   */
   async function copyIssueToMarkdown() {
     try {
       const pageType = checkPageType();
@@ -179,7 +211,14 @@ ${separator}`;
     }
   }
 
-  // 지식베이스 복사 함수 추가
+  /**
+   * YouTrack 지식베이스 문서를 마크다운 형식으로 복사하는 함수
+   * @returns {Promise<Object>} 복사 결과 객체
+   * @property {boolean} success - 복사 성공 여부
+   * @property {string} [markdown] - 생성된 마크다운 텍스트
+   * @property {string} [error] - 오류 메시지
+   * @property {string} [details] - 상세 오류 정보
+   */
   async function copyKnowledgeBaseToMarkdown() {
     try {
       const pageType = checkPageType();
