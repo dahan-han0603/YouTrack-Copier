@@ -133,12 +133,42 @@
    */
   function checkPageType() {
     const url = window.location.href;
-    // YouTrack의 이슈 URL 패턴을 더 정확하게 체크
-    if (url.match(/youtrack\.cloud\/issue\/.+/) || url.includes('/agiles/') || url.includes('/issues/')) {
+    const searchParams = new URL(url).searchParams;
+    
+    // 디버깅을 위한 로그 추가
+    console.debug('현재 URL:', url);
+    console.debug('URL 파라미터:', Object.fromEntries(searchParams));
+    
+    // 간트차트 패턴 체크
+    if (url.includes('gantt-charts')) {
+      console.debug('간트차트 페이지 감지');
+      
+      // 1. URL 파라미터로 issue가 전달되는 경우
+      if (searchParams.has('issue')) {
+        console.debug('간트차트 이슈 팝업 감지 (파라미터) - issue:', searchParams.get('issue'));
+        return 'issue';
+      }
+      
+      // 2. URL 경로에 이슈 정보가 포함된 경우
+      const pathMatch = url.match(/gantt-charts\/(\d+-\d+)/);
+      if (pathMatch) {
+        console.debug('간트차트 이슈 감지 (경로) - ID:', pathMatch[1]);
+        return 'issue';
+      }
+    }
+    
+    // 기존 이슈 URL 패턴 체크
+    if (url.match(/youtrack\.cloud\/issue\/.+/) || 
+        url.includes('/agiles/') || 
+        url.includes('/issues/')) {
+      console.debug('일반 이슈 페이지 감지');
       return 'issue';
     } else if (url.includes('/articles/')) {
+      console.debug('지식베이스 페이지 감지');
       return 'knowledgeBase';
     }
+    
+    console.debug('알 수 없는 페이지 타입');
     return 'unknown';
   }
 
@@ -153,11 +183,10 @@
   async function copyIssueToMarkdown() {
     try {
       const pageType = checkPageType();
+      console.debug('페이지 타입:', pageType);
+      
       if (pageType !== 'issue') {
-        return {
-          success: false,
-          error: '이슈 페이지에서만 사용할 수 있습니다.'
-        };
+        throw new Error('이슈 페이지에서만 사용할 수 있습니다. (현재 페이지 타입: ' + pageType + ')');
       }
 
       const selectors = getSelectors();

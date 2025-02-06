@@ -11,7 +11,8 @@ chrome.runtime.onInstalled.addListener(() => {
     documentUrlPatterns: [
       "*://*.youtrack.cloud/issue/*",
       "*://*.youtrack.cloud/issues/*",
-      "*://*.youtrack.cloud/agiles/*"
+      "*://*.youtrack.cloud/agiles/*",
+      "*://*.youtrack.cloud/gantt-charts/*"
     ]
   });
 
@@ -32,6 +33,9 @@ chrome.runtime.onInstalled.addListener(() => {
  */
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   try {
+    console.debug('컨텍스트 메뉴 클릭:', info.menuItemId);
+    console.debug('현재 탭 URL:', tab.url);
+
     // 복사 함수 실행
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -43,6 +47,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       target: { tabId: tab.id },
       func: async (menuId) => {
         try {
+          console.debug('복사 함수 실행:', menuId);
+          
           // 메뉴 ID에 따라 다른 함수 호출
           if (menuId === "copyIssue") {
             return await window.copyIssueToMarkdown();
@@ -52,30 +58,40 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
           throw new Error("지원하지 않는 메뉴입니다.");
         } catch (error) {
           console.error('복사 중 오류:', error);
-          return { success: false, error: error.message };
+          return { 
+            success: false, 
+            error: error.message,
+            details: error.stack
+          };
         }
       },
       args: [info.menuItemId]
     });
 
     const result = copyResults[0].result;
-    if (result.success) {
-      await chrome.notifications.create({
-        type: 'basic',
-        iconUrl: '/icons/icon48.png',
-        title: '복사 완료',
-        message: '클립보드에 복사되었습니다.'
-      });
-    } else {
-      throw new Error(result.error || '클립보드 복사 실패');
+    if (!result.success) {
+      console.error('복사 실패:', result.error);
+      console.debug('오류 상세:', result.details);
+      throw new Error(result.error);
     }
+
+    await chrome.notifications.create({
+      type: 'basic',
+      iconUrl: '/icons/icon48.png',
+      title: '복사 완료',
+      message: '클립보드에 복사되었습니다.'
+    });
   } catch (error) {
-    console.error('컨텍스트 메뉴 처리 중 오류:', error);
+    console.error('컨텍스트 메뉴 처리 중 오류:', {
+      message: error.message,
+      stack: error.stack
+    });
+    
     await chrome.notifications.create({
       type: 'basic',
       iconUrl: '/icons/icon48.png',
       title: '복사 실패',
-      message: '복사 중 오류가 발생했습니다.'
+      message: error.message || '복사 중 오류가 발생했습니다.'
     });
   }
 }); 
