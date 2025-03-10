@@ -51,7 +51,7 @@
         fallback: '.fieldValueButton__a700'
       },
       knowledgeBase: {
-        id: '.idLink__ee62 .articleId__ca09',
+        id: '.articleId__ca09',
         title: '.header__efad h1',
         content: '.articleContent__cdf9',
         project: '.breadCrumb__c48e.nonShrinkable__cca0'
@@ -260,16 +260,17 @@ ${separator}`;
 
       const selectors = getSelectors();
       
-      // 프로젝트 이름 추출
-      const projectElement = document.querySelector(selectors.knowledgeBase.project);
-      const projectName = projectElement.textContent.trim();
+      // 프로젝트 이름 추출 (현재 URL에서 추출)
+      const projectName = window.location.pathname.split('/')[2] || 'Unknown';
 
-      // 지식베이스 ID 추출
-      const idElement = document.querySelector(selectors.knowledgeBase.id);
-      const kbId = idElement.textContent.trim();
+      // 지식베이스 ID 추출 (URL에서 추출)
+      const kbId = window.location.pathname.split('/').pop() || 'Unknown';
 
-      // 제목 추출
+      // 제목 추출 (새로운 선택자 사용)
       const titleElement = document.querySelector(selectors.knowledgeBase.title);
+      if (!titleElement) {
+        throw new Error('제목을 찾을 수 없습니다.');
+      }
       const title = titleElement.textContent.trim();
 
       // 링크 생성
