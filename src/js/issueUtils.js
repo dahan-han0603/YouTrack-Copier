@@ -41,8 +41,8 @@
   function getSelectors() {
     return {
       issueId: {
-        primary: '.idLink__ee62 .ring-ui-link_c238',
-        fallback: '[data-test="ring-link"]'
+        primary: '.idLink__c006 [data-test="ring-link"]',
+        fallback: '.ticketId__dab2'
       },
       title: '[data-test="ticket-summary"]',
       content: '.description__e030',
